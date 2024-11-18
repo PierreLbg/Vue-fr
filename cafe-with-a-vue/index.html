@@ -19,27 +19,27 @@
 
 			<section class="menu">
 				<h2>Menu</h2>
-				<div class="menu-item">
+				<div class="menu-item" v-for="article in simpleMenu">
 					<img
 						class="menu-item__image"
-						src="https://via.placeholder.com/300x150"
-						alt=""
+						v-bind:src="article.image.source"
+						v-bind:alt="article.image.alt"
 					/>
 					<div>
 						<h3>Nom de l'article</h3>
-						<p>En stock</p>
-						<p>En rupture de stock</p>
+						<p v-if="article.inStock">En stock</p>
+						<p v-if="!article.inStock">En rupture de stock</p>
 						<div>
 							<label for="add-item-quantity">Quantité :</label>
-							<input id="add-item-quantity" type="number" />
-							<button>Ajouter au panier d'achat</button>
+							<input id="add-item-quantity" type="number" v-model="article.quantity"/>
+							<button v-on:click="addToShoppingCart(article.name)">Ajouter au panier d'achat</button>
 						</div>
 					</div>
 				</div>
 			</section>
 
 			<aside class="shopping-cart">
-				<h2>Panier d'achat: 0 articles</h2>
+				<h2>Panier d'achat: {{ shoppingCart }} articles</h2>
 			</aside>
 
 			<h2>Contactez nous</h2>
@@ -75,7 +75,7 @@
 								alt: "Un croissant"
 							},
 							inStock: true,
-							quantity: 1
+							quantity: 4
 						},
 						{
 							name: "Baguette de pain",
@@ -95,13 +95,28 @@
 							inStock: false,
 							quantity: 1
 						}
-					]
+					],
+					shoppingCart : 0
 				},
 				computed: {
 					copyright() {
 						const currentYear = new Date().getFullYear()
 
 						return `Copyright ${this.restaurantName} ${currentYear}`
+					}
+				},
+				methods: {
+					addToShoppingCart(articleName){
+						console.log(this.simpleMenu);
+						console.log(articleName);
+						const article = this.simpleMenu.find(article => article.name == articleName)
+						console.log(article)
+						if(article.inStock){
+							article.quantity -= 1
+							this.shoppingCart += 1
+							if(article.quantity == 0)
+								article.inStock = false
+						}
 					}
 				}
 			})
